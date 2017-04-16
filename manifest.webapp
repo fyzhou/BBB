@@ -1,0 +1,22 @@
+{
+  "version": "1.0.0",
+  "name": "Blaze Badge Bannermen",
+  "launch_path": "/index.html",
+  "description": "Website",
+  "developer": {
+    "name": "Franklin Zhou",
+    "url": "https://feh-1-5a428.firebaseapp.comOB"
+  },
+  "installs_allowed_from": [
+    "*"
+  ],
+  "default_locale": "en",
+  "permissions": {
+  },
+  "locales": {
+    "en": {
+      "name": "Blaze Badge Bannermen",
+      "description": "Website"
+    }
+  }
+}

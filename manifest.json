@@ -1,0 +1,7 @@
+{
+  "name": "Blaze Badge Bannermen",
+  "short_name": "BBB",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "portrait"
+}
