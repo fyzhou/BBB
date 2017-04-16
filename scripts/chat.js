@@ -16,7 +16,7 @@
 'use strict';
 
 // Initializes FriendlyChat.
-function FriendlyChat() {
+function FriendlyChat(authManager) {
   this.checkSetup();
 
   // Shortcuts to DOM Elements.
@@ -32,25 +32,28 @@ function FriendlyChat() {
 
   // Saves message on form submit.
   this.messageForm.addEventListener('submit', this.saveMessage.bind(this));
-  this.signOutButton.addEventListener('click', this.signOut.bind(this));
-  this.signInButton.addEventListener('click', this.signIn.bind(this));
 
   // Toggle for the button.
   var buttonTogglingHandler = this.toggleButton.bind(this);
   this.messageInput.addEventListener('keyup', buttonTogglingHandler);
   this.messageInput.addEventListener('change', buttonTogglingHandler);
 
-  this.initFirebase();
+  // Shortcuts to Firebase SDK features.
+  this.auth = authManager.auth;
+  this.database = authManager.database;
+  this.storage = authManager.storage;
+  
+  // Shitty Hack - dunno the appropriate pattern for registering a log in/log out thing here
+  // The whole thing is a shitty hack, but I want to get the idea out first.
+  this.loadMessages(); // We load currently existing chat messages.
 } 
 
 // Sets up shortcuts to Firebase features and initiate firebase auth.
 FriendlyChat.prototype.initFirebase = function() {
-  // Shortcuts to Firebase SDK features.
-  this.auth = firebase.auth();
-  this.database = firebase.database();
-  this.storage = firebase.storage();
-  // Initiates Firebase auth and listen to auth state changes.
-  this.auth.onAuthStateChanged(this.onAuthStateChanged.bind(this));
+	// Shortcuts to Firebase SDK features.
+	this.auth = firebase.auth();
+	this.database = firebase.database();
+	this.storage = firebase.storage();
 };
 
 // Loads chat messages history and listens for upcoming ones.
@@ -88,7 +91,7 @@ FriendlyChat.prototype.saveMessage = function(e) {
       console.error('Error writing new message to Firebase Database', error);
     });
   }
-};
+  };
 
 // Sets the URL of the given img element with the URL of the image stored in Firebase Storage.
 FriendlyChat.prototype.setImageUrl = function(imageUri, imgElement) {
@@ -100,51 +103,6 @@ FriendlyChat.prototype.setImageUrl = function(imageUri, imgElement) {
     });
   } else {
     imgElement.src = imageUri;
-  }
-};
-
-// Signs-in Friendly Chat.
-FriendlyChat.prototype.signIn = function() {
-  // Sign in Firebase using popup auth and Google as the identity provider.
-  var provider = new firebase.auth.GoogleAuthProvider();
-  this.auth.signInWithPopup(provider);
-};
-
-// Signs-out of Friendly Chat.
-FriendlyChat.prototype.signOut = function() {
-  // Sign out of Firebase.
-  this.auth.signOut();
-};
-
-// Triggers when the auth state change for instance when the user signs-in or signs-out.
-FriendlyChat.prototype.onAuthStateChanged = function(user) {
-  if (user) { // User is signed in!
-    // Get profile pic and user's name from the Firebase user object.
-    var profilePicUrl = user.photoURL;
-    var userName = user.displayName;
-
-    // Set the user's profile pic and name.
-    this.userPic.style.backgroundImage = 'url(' + (profilePicUrl || '/images/profile_placeholder.png') + ')';
-    this.userName.textContent = userName;
-
-    // Show user's profile and sign-out button.
-    this.userName.removeAttribute('hidden');
-    this.userPic.removeAttribute('hidden');
-    this.signOutButton.removeAttribute('hidden');
-
-    // Hide sign-in button.
-    this.signInButton.setAttribute('hidden', 'true');
-
-    // We load currently existing chant messages.
-    this.loadMessages();
-  } else { // User is signed out!
-    // Hide user's profile and sign-out button.
-    this.userName.setAttribute('hidden', 'true');
-    this.userPic.setAttribute('hidden', 'true');
-    this.signOutButton.setAttribute('hidden', 'true');
-
-    // Show sign-in button.
-    this.signInButton.removeAttribute('hidden');
   }
 };
 
@@ -232,8 +190,4 @@ FriendlyChat.prototype.checkSetup = function() {
   } else if (config.storageBucket === '') {
     window.alert('Firebase Storage bucket has not been enabled.');
   }
-};
-
-window.onload = function() {
-  window.friendlyChat = new FriendlyChat();
 };

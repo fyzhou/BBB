@@ -158,12 +158,16 @@ main, #messages-card {
   padding: 0 6px 0 1px;
   min-width: 0;
 }
-
+#image-form #submitImage .material-icons {
+  top: -1px;
+}
 .message img {
   max-width: 300px;
   max-height: 200px;
 }
-
+#mediaCapture {
+  display: none;
+}
 @media screen and (max-width: 610px) {
   header {
     height: 113px;
