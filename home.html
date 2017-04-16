@@ -89,6 +89,10 @@
         messagingSenderId: "417856407765"
       };
       firebase.initializeApp(config);
+
+      window.onload = function() {
+        window.authManager = new FirebaseManager();
+      };
     </script>
   </body>
 </html>
